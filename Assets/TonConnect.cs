@@ -1,10 +1,16 @@
 using System;
+using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
+
+
 
 public class TonConnect : MonoBehaviour
 {
@@ -16,6 +22,10 @@ public class TonConnect : MonoBehaviour
 
     public RawImage image1; 
     public RawImage image2;
+
+    public static readonly UTF8Encoding Encoder = new UTF8Encoding();
+    public static readonly byte[] Buffer = new byte[2048];
+    public static readonly HttpClient HttpClient = new HttpClient();
 
     private void Start()
     {
@@ -35,6 +45,8 @@ public class TonConnect : MonoBehaviour
 
         var connectRequestJson = JsonConvert.SerializeObject(connectRequest);
 
+        Debug.Log(connectRequestJson);
+
         var id = GenerateRandomId();
 
         //Tonkeeper
@@ -48,6 +60,8 @@ public class TonConnect : MonoBehaviour
         // Display QR code
         StartCoroutine(LoadQrCode(url, image1));
         StartCoroutine(LoadQrCode(url2, image2));
+        OpenSSEStream($"https://bridge.tonapi.io/bridge/events?client_id={id}");
+
     }
 
     private string GenerateRandomId()
@@ -76,6 +90,24 @@ public class TonConnect : MonoBehaviour
         else
         {
             Debug.LogError(request.error);
+        }
+    }
+
+        public static async Task OpenSSEStream(string url)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("Accept", "text/event-stream");
+        using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        using var stream = await response.Content.ReadAsStreamAsync();
+
+        while (true)
+        {
+            var len = await stream.ReadAsync(Buffer, 0, Buffer.Length);
+            if (len > 0)
+            {
+                var text = Encoder.GetString(Buffer, 0, len);
+                Debug.Log(text);
+            }
         }
     }
 }
