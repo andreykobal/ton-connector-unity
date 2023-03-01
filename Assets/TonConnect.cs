@@ -48,6 +48,7 @@ public class TonConnect : MonoBehaviour
         Debug.Log(connectRequestJson);
 
         var id = GenerateRandomId();
+        Debug.Log("ID: " + id);
 
         //Tonkeeper
         var url = $"{walletUniversalUrl}?v=2&id={id}&r={UnityWebRequest.EscapeURL(connectRequestJson)}&ret=none";
