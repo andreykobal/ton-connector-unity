@@ -31,9 +31,13 @@ public class TonConnect : MonoBehaviour
     public string SenderId; 
     public Button sendTransactionButton;
 
+    public GameObject QRCodes;
+    public GameObject connectionSuccess;
+
 
     private void Start()
     {
+        connectionSuccess.SetActive(false);
         sendTransactionButton.onClick.AddListener(OnSendTransactionButtonClick);
 
         var connectRequest = new ConnectRequest
@@ -108,23 +112,30 @@ public class TonConnect : MonoBehaviour
         }
     }
 
-        public static async Task OpenSSEStream(string url)
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("Accept", "text/event-stream");
-        using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-        using var stream = await response.Content.ReadAsStreamAsync();
+public async Task OpenSSEStream(string url)
+{
+    using var request = new HttpRequestMessage(HttpMethod.Get, url);
+    request.Headers.Add("Accept", "text/event-stream");
+    using var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+    using var stream = await response.Content.ReadAsStreamAsync();
 
-        while (true)
+    TonConnect tonConnect = FindObjectOfType<TonConnect>();
+    while (true)
+    {
+        var len = await stream.ReadAsync(Buffer, 0, Buffer.Length);
+        if (len > 0)
         {
-            var len = await stream.ReadAsync(Buffer, 0, Buffer.Length);
-            if (len > 0)
+            var text = Encoder.GetString(Buffer, 0, len);
+            if (text.Contains("data:"))
             {
-                var text = Encoder.GetString(Buffer, 0, len);
-                Debug.Log(text);
+                Debug.Log("Connection successful!");
+                tonConnect.QRCodes.SetActive(false);
+                tonConnect.connectionSuccess.SetActive(true);
             }
+            Debug.Log(text);
         }
     }
+}
 }
 
 
