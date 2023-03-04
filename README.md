@@ -1,4 +1,6 @@
 # TON UNITY SDK
+![ton-sdk](https://user-images.githubusercontent.com/19206978/222931531-2674e9be-aa0d-4b12-8103-a800cda39034.png)
+
 The TON UNITY SDK allows you to connect TON-compatible wallets in Unity using QR code and send transactions. This SDK uses Ton Connect v2 for wallet integration.
 
 ## How to Use
