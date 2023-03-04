@@ -26,7 +26,7 @@ Before using this SDK, you need to have:
 7. To send a transaction, simply click the sendTransactionButton. This will call the SendTransaction() method in the TransactionSender script, passing in the client ID.
 
 ### Examples
-See the included **ExampleScene** in the Unity project for an example implementation.
+See the included **SampleScene** in the Unity project for an example implementation.
 
 ### Contributors
 This project was created by @andreykobal. Feel free to contribute to this project by submitting pull requests or issues.
