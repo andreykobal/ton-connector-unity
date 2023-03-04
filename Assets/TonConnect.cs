@@ -27,8 +27,15 @@ public class TonConnect : MonoBehaviour
     public static readonly byte[] Buffer = new byte[2048];
     public static readonly HttpClient HttpClient = new HttpClient();
 
+    public TransactionSender sender;
+    public string SenderId; 
+    public Button sendTransactionButton;
+
+
     private void Start()
     {
+        sendTransactionButton.onClick.AddListener(OnSendTransactionButtonClick);
+
         var connectRequest = new ConnectRequest
         {
             manifestUrl = manifestUrl,
@@ -48,7 +55,8 @@ public class TonConnect : MonoBehaviour
         Debug.Log(connectRequestJson);
 
         var id = GenerateRandomId();
-        Debug.Log("ID: " + id);
+        SenderId = id;
+        Debug.LogError("ID: " + id);
 
         //Tonkeeper
         var url = $"{walletUniversalUrl}?v=2&id={id}&r={UnityWebRequest.EscapeURL(connectRequestJson)}&ret=none";
@@ -62,6 +70,12 @@ public class TonConnect : MonoBehaviour
         StartCoroutine(LoadQrCode(url, image1));
         StartCoroutine(LoadQrCode(url2, image2));
         OpenSSEStream($"https://bridge.tonapi.io/bridge/events?client_id={id}");
+
+    }
+
+    void OnSendTransactionButtonClick() {
+            Debug.Log("Send transaction button clicked!");
+            sender.SendTransaction(SenderId);
 
     }
 
